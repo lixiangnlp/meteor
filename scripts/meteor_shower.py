@@ -73,7 +73,7 @@ def main(argv):
         t.join()
 
     # Sort output
-    sort_cmd = 'cat {0}/output.* | sort -g -S4G > {0}/output.sort'.format(work_dir)
+    sort_cmd = 'cat {0}/output.* |sort -g -S4G --parallel={1} >{0}/output.sort'.format(work_dir, n_jobs)
     subprocess.call(sort_cmd, shell=True)
 
 # Run commands until end of queue
