@@ -144,8 +144,8 @@ public class Trainer {
 		if (task.equals("segcor")) {
 			segcor(dataDir, paraFile, charBased, false);
 		} else if (task.equals("spearman")) {
-            segcor(dataDir, paraFile, charBased, true);
-        } else if (task.equals("rank")) {
+			segcor(dataDir, paraFile, charBased, true);
+		} else if (task.equals("rank")) {
 			rank(dataDir, paraFile, charBased);
 		} else {
 			System.err.println("Please specify a valid task");
@@ -288,7 +288,8 @@ public class Trainer {
 				meteorScore.add(stats.score);
 			}
 
-			double correlation = spearman ? spearman(meteorScore, terList) : pearsonWeighted(meteorScore, terList, lengthList);
+			double correlation = spearman ? spearman(meteorScore, terList)
+					: pearsonWeighted(meteorScore, terList, lengthList);
 
 			out.print(correlation);
 			for (Double n : weights)
@@ -304,53 +305,53 @@ public class Trainer {
 		}
 	}
 
-    private static double spearman(ArrayList<Double> x, ArrayList<Double> y) {
+	private static double spearman(ArrayList<Double> x, ArrayList<Double> y) {
 
-        int N = x.size();
-        double[][] xy = new double[N][];
+		int N = x.size();
+		double[][] xy = new double[N][];
 
-        for (int i = 0; i < N; i++) {
-            xy[i] = new double[]{x.get(i), y.get(i)};
-        }
-        // Rank X
-        Arrays.sort(xy, new xyComparatorX());
-        rankArray(xy, 0);
-        // Rank Y
-        Arrays.sort(xy, new xyComparatorY());
-        rankArray(xy, 1);
-        // Rank correlation
-        return pearson(xy);
-    }
+		for (int i = 0; i < N; i++) {
+			xy[i] = new double[] { x.get(i), y.get(i) };
+		}
+		// Rank X
+		Arrays.sort(xy, new xyComparatorX());
+		rankArray(xy, 0);
+		// Rank Y
+		Arrays.sort(xy, new xyComparatorY());
+		rankArray(xy, 1);
+		// Rank correlation
+		return pearson(xy);
+	}
 
-    private static void rankArray(double[][] xy, int idx) {
-        double sum = 0;
-        int count = 0;
-        for (int i = 0; i < xy.length; i++) {
-            sum += (i + 1);
-            count += 1;
-            if (i == xy.length - 1 || xy[i][idx] != xy[i + 1][idx]) {
-                for (int j = 0; j < count; j++) {
-                    xy[i - j][idx] = (sum / count);
-                }
-                sum = 0;
-                count = 0;
-            }
-        }
-    }
+	private static void rankArray(double[][] xy, int idx) {
+		double sum = 0;
+		int count = 0;
+		for (int i = 0; i < xy.length; i++) {
+			sum += (i + 1);
+			count += 1;
+			if (i == xy.length - 1 || xy[i][idx] != xy[i + 1][idx]) {
+				for (int j = 0; j < count; j++) {
+					xy[i - j][idx] = (sum / count);
+				}
+				sum = 0;
+				count = 0;
+			}
+		}
+	}
 
-    private static class xyComparatorX implements Comparator<double[]> {
-        public int compare(double[] o1, double[] o2) {
-            return Double.compare(o1[0], o2[0]);
-        }
-    }
+	private static class xyComparatorX implements Comparator<double[]> {
+		public int compare(double[] o1, double[] o2) {
+			return Double.compare(o1[0], o2[0]);
+		}
+	}
 
-    private static class xyComparatorY implements Comparator<double[]> {
-        public int compare(double[] o1, double[] o2) {
-            return Double.compare(o1[1], o2[1]);
-        }
-    }
+	private static class xyComparatorY implements Comparator<double[]> {
+		public int compare(double[] o1, double[] o2) {
+			return Double.compare(o1[1], o2[1]);
+		}
+	}
 
-    private static double pearson(double[][] xy) {
+	private static double pearson(double[][] xy) {
 
 		int N = xy.length;
 
@@ -385,8 +386,8 @@ public class Trainer {
 		return corr_pearson;
 	}
 
-	private static double pearsonWeighted(ArrayList<Double> x, ArrayList<Double> y,
-			ArrayList<Double> w) {
+	private static double pearsonWeighted(ArrayList<Double> x,
+			ArrayList<Double> y, ArrayList<Double> w) {
 
 		int N = w.size();
 
