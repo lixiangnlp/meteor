@@ -16,6 +16,7 @@ import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 
@@ -67,7 +68,7 @@ public class Trainer {
 					.println("Usage: java -XX:+UseCompressedOops -Xmx2G -cp meteor-*.jar Trainer "
 							+ "<task> <dataDir> [options]");
 			System.out.println();
-			System.out.println("Tasks:\t\t\t\tOne of: segcor rank");
+			System.out.println("Tasks:\t\t\t\tOne of: segcor spearman rank");
 			System.out.println();
 			System.out.println("Options:");
 			System.out.println("-a paraphrase");
@@ -141,8 +142,10 @@ public class Trainer {
 
 		// Task
 		if (task.equals("segcor")) {
-			segcor(dataDir, paraFile, charBased);
-		} else if (task.equals("rank")) {
+			segcor(dataDir, paraFile, charBased, false);
+		} else if (task.equals("spearman")) {
+            segcor(dataDir, paraFile, charBased, true);
+        } else if (task.equals("rank")) {
 			rank(dataDir, paraFile, charBased);
 		} else {
 			System.err.println("Please specify a valid task");
@@ -152,7 +155,7 @@ public class Trainer {
 	}
 
 	private static void segcor(String dataDir, String paraFile,
-			boolean charBased) {
+			boolean charBased, boolean spearman) {
 		/*
 		 * Run Meteor on each available set and collect the sufficient
 		 * statistics for rescoring. Create the MeteorStats list and the TER
@@ -253,10 +256,10 @@ public class Trainer {
 		weights = new ArrayList<Double>(initialWeights);
 
 		int param = 0;
-		rescore(param);
+		rescore(param, spearman);
 	}
 
-	private static void rescore(int param) {
+	private static void rescore(int param, boolean spearman) {
 		// Rescore if all weights specified
 		if (param == step.size()) {
 
@@ -285,7 +288,7 @@ public class Trainer {
 				meteorScore.add(stats.score);
 			}
 
-			double correlation = pearson(meteorScore, terList, lengthList);
+			double correlation = spearman ? spearman(meteorScore, terList) : pearsonWeighted(meteorScore, terList, lengthList);
 
 			out.print(correlation);
 			for (Double n : weights)
@@ -297,11 +300,92 @@ public class Trainer {
 		for (double n = initialWeights.get(param); n <= finalWeights.get(param); n += step
 				.get(param)) {
 			weights.set(param, n);
-			rescore(param + 1);
+			rescore(param + 1, spearman);
 		}
 	}
 
-	private static double pearson(ArrayList<Double> x, ArrayList<Double> y,
+    private static double spearman(ArrayList<Double> x, ArrayList<Double> y) {
+
+        int N = x.size();
+        double[][] xy = new double[N][];
+
+        for (int i = 0; i < N; i++) {
+            xy[i] = new double[]{x.get(i), y.get(i)};
+        }
+        // Rank X
+        Arrays.sort(xy, new xyComparatorX());
+        rankArray(xy, 0);
+        // Rank Y
+        Arrays.sort(xy, new xyComparatorY());
+        rankArray(xy, 1);
+        // Rank correlation
+        return pearson(xy);
+    }
+
+    private static void rankArray(double[][] xy, int idx) {
+        double sum = 0;
+        int count = 0;
+        for (int i = 0; i < xy.length; i++) {
+            sum += (i + 1);
+            count += 1;
+            if (i == xy.length - 1 || xy[i][idx] != xy[i + 1][idx]) {
+                for (int j = 0; j < count; j++) {
+                    xy[i - j][idx] = (sum / count);
+                }
+                sum = 0;
+                count = 0;
+            }
+        }
+    }
+
+    private static class xyComparatorX implements Comparator<double[]> {
+        public int compare(double[] o1, double[] o2) {
+            return Double.compare(o1[0], o2[0]);
+        }
+    }
+
+    private static class xyComparatorY implements Comparator<double[]> {
+        public int compare(double[] o1, double[] o2) {
+            return Double.compare(o1[1], o2[1]);
+        }
+    }
+
+    private static double pearson(double[][] xy) {
+
+		int N = xy.length;
+
+		double sum_x = 0.0;
+		double sum_y = 0.0;
+
+		for (int i = 0; i < N; i++) {
+			sum_x += xy[i][0];
+			sum_y += xy[i][1];
+		}
+
+		double mean_x = (sum_x / N);
+		double mean_y = (sum_y / N);
+
+		double cov_x_y_top = 0.0;
+		double cov_x_x_top = 0.0;
+		double cov_y_y_top = 0.0;
+
+		for (int i = 0; i < N; i++) {
+			cov_x_y_top += ((xy[i][0] - mean_x) * (xy[i][1] - mean_y));
+			cov_x_x_top += ((xy[i][0] - mean_x) * (xy[i][0] - mean_x));
+			cov_y_y_top += ((xy[i][1] - mean_y) * (xy[i][1] - mean_y));
+		}
+
+		double cov_x_y = cov_x_y_top / N;
+		double cov_x_x = cov_x_x_top / N;
+		double cov_y_y = cov_y_y_top / N;
+
+		double corr_pearson = cov_x_y / Math.sqrt(cov_x_x * cov_y_y);
+		if (Double.isNaN(corr_pearson))
+			return 0.0;
+		return corr_pearson;
+	}
+
+	private static double pearsonWeighted(ArrayList<Double> x, ArrayList<Double> y,
 			ArrayList<Double> w) {
 
 		int N = w.size();
