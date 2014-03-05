@@ -21,7 +21,7 @@ import edu.cmu.meteor.util.Constants;
  */
 public class MeteorStats {
 
-	public static final int STATS_LENGTH = 21;
+	public static final int STATS_LENGTH = 23;
 
 	/* Aggregable statistics */
 
