@@ -75,6 +75,7 @@ public class Trainer {
 			System.out.println("-e epsilon");
 			System.out.println("-l language");
 			System.out.println("-ch\t\t\t\tfor character-based P and R");
+			System.out.println("-noNorm\t\t\t\tdon't normalize, sgm files are pre-tokenized");
 			System.out.println("-i 'p1 p2 p3 p4 w1 w2 w3 w4'\tInitial "
 					+ "parameters and weights");
 			System.out.println("-f 'p1 p2 p3 p4 w1 w2 w3 w4'\tFinal "
@@ -87,6 +88,7 @@ public class Trainer {
 		String dataDir = args[1];
 		String paraFile = "";
 		boolean charBased = false;
+        boolean noNorm = false;
 
 		// Load defaults
 		initialWeights = new ArrayList<Double>();
@@ -123,6 +125,9 @@ public class Trainer {
 			} else if (args[curArg].equals("-ch")) {
 				charBased = true;
 				curArg += 1;
+			} else if (args[curArg].equals("-noNorm")) {
+				noNorm = true;
+				curArg += 1;
 			} else {
 				System.err.println("Unknown option \"" + args[curArg] + "\"");
 				System.exit(1);
@@ -142,11 +147,11 @@ public class Trainer {
 
 		// Task
 		if (task.equals("segcor")) {
-			segcor(dataDir, paraFile, charBased, false);
+			segcor(dataDir, paraFile, charBased, noNorm, false);
 		} else if (task.equals("spearman")) {
-			segcor(dataDir, paraFile, charBased, true);
+			segcor(dataDir, paraFile, charBased, noNorm, true);
 		} else if (task.equals("rank")) {
-			rank(dataDir, paraFile, charBased);
+			rank(dataDir, paraFile, charBased, noNorm);
 		} else {
 			System.err.println("Please specify a valid task");
 			System.exit(1);
@@ -155,7 +160,7 @@ public class Trainer {
 	}
 
 	private static void segcor(String dataDir, String paraFile,
-			boolean charBased, boolean spearman) {
+			boolean charBased, boolean noNorm, boolean spearman) {
 		/*
 		 * Run Meteor on each available set and collect the sufficient
 		 * statistics for rescoring. Create the MeteorStats list and the TER
@@ -202,7 +207,7 @@ public class Trainer {
 					System.exit(1);
 				}
 
-				Meteor.main(getMArgs(testFile, refFile, paraFile, charBased));
+				Meteor.main(getMArgs(testFile, refFile, paraFile, charBased, noNorm));
 
 				// Store the MeteorStats
 				try {
@@ -424,7 +429,7 @@ public class Trainer {
 		return corr_pearson;
 	}
 
-	private static void rank(String dataDir, String paraFile, boolean charBased) {
+	private static void rank(String dataDir, String paraFile, boolean charBased, boolean noNorm) {
 		/*
 		 * Run Meteor on each available set and collect the sufficient
 		 * statistics for rescoring. Create the MeteorStats list and the TER
@@ -457,7 +462,7 @@ public class Trainer {
 			String test = dataDir + "/" + tstFile;
 			String ref = dataDir + "/" + refFile;
 
-			Meteor.main(getMArgs(test, ref, paraFile, charBased));
+			Meteor.main(getMArgs(test, ref, paraFile, charBased, noNorm));
 
 			if (!segIdx.containsKey(langPair))
 				segIdx.put(langPair,
@@ -640,7 +645,7 @@ public class Trainer {
 	}
 
 	private static String[] getMArgs(String testFile, String refFile,
-			String paraFile, boolean charBased) {
+			String paraFile, boolean charBased, boolean noNorm) {
 
 		int langID = Constants.getLanguageID(Constants
 				.normLanguageName(language));
@@ -657,13 +662,17 @@ public class Trainer {
 		}
 		modString = modString.trim();
 		weightString = weightString.trim();
-		String[] mArgs = { testFile, refFile, "-sgml", "-norm", "-ssOut", "-l",
+		String[] mArgs = { testFile, refFile, "-sgml", "-ssOut", "-l",
 				language, "-m", modString, "-a", paraFile, "-w", weightString,
 				"-p", "0.5 0.5 0.5 0.5" };
 		if (charBased) {
 			mArgs = Arrays.copyOf(mArgs, mArgs.length + 1);
 			mArgs[mArgs.length - 1] = "-ch";
 		}
+        if (!noNorm) {
+            mArgs = Arrays.copyOf(mArgs, mArgs.length + 1);
+            mArgs[mArgs.length - 1] = "-norm";
+        }
 		return mArgs;
 	}
 }
