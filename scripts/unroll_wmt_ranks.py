@@ -44,7 +44,9 @@ def main(argv):
             # Skip blank
             if r != -1:
                 ranked.append((r, s))
+        # Sort by rank, lowest to highest
         ranked.sort()
+        # Unroll to binary judgments
         for i in range(len(ranked)):
             for j in range(i + 1, len(ranked)):
                 # Skip ties
