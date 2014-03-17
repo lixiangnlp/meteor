@@ -115,7 +115,6 @@ public class MeteorConfiguration {
 	 * @param task
 	 */
 	public void setTask(String task) {
-		System.out.println(Constants.getTaskID(task));
 		setTask(Constants.getTaskID(task));
 	}
 
