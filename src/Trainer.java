@@ -75,7 +75,10 @@ public class Trainer {
 			System.out.println("-e epsilon");
 			System.out.println("-l language");
 			System.out.println("-ch\t\t\t\tfor character-based P and R");
-			System.out.println("-noNorm\t\t\t\tdon't normalize, sgm files are pre-tokenized");
+			System.out
+					.println("-noNorm\t\t\t\tdon't normalize, sgm files are pre-tokenized");
+			System.out
+					.println("-multi\t\t\t\tmulti-language.  Use noNorm and language-specific words/paraphrases");
 			System.out.println("-i 'p1 p2 p3 p4 w1 w2 w3 w4'\tInitial "
 					+ "parameters and weights");
 			System.out.println("-f 'p1 p2 p3 p4 w1 w2 w3 w4'\tFinal "
@@ -88,7 +91,8 @@ public class Trainer {
 		String dataDir = args[1];
 		String paraFile = "";
 		boolean charBased = false;
-        boolean noNorm = false;
+		boolean noNorm = false;
+		boolean multi = true;
 
 		// Load defaults
 		initialWeights = new ArrayList<Double>();
@@ -128,6 +132,10 @@ public class Trainer {
 			} else if (args[curArg].equals("-noNorm")) {
 				noNorm = true;
 				curArg += 1;
+			} else if (args[curArg].equals("-multi")) {
+				noNorm = true;
+				multi = true;
+				curArg += 1;
 			} else {
 				System.err.println("Unknown option \"" + args[curArg] + "\"");
 				System.exit(1);
@@ -151,7 +159,7 @@ public class Trainer {
 		} else if (task.equals("spearman")) {
 			segcor(dataDir, paraFile, charBased, noNorm, true);
 		} else if (task.equals("rank")) {
-			rank(dataDir, paraFile, charBased, noNorm);
+			rank(dataDir, paraFile, charBased, noNorm, multi);
 		} else {
 			System.err.println("Please specify a valid task");
 			System.exit(1);
@@ -207,7 +215,8 @@ public class Trainer {
 					System.exit(1);
 				}
 
-				Meteor.main(getMArgs(testFile, refFile, paraFile, charBased, noNorm));
+				Meteor.main(getMArgs(testFile, refFile, paraFile, charBased,
+						noNorm, false));
 
 				// Store the MeteorStats
 				try {
@@ -429,7 +438,8 @@ public class Trainer {
 		return corr_pearson;
 	}
 
-	private static void rank(String dataDir, String paraFile, boolean charBased, boolean noNorm) {
+	private static void rank(String dataDir, String paraFile,
+			boolean charBased, boolean noNorm, boolean multi) {
 		/*
 		 * Run Meteor on each available set and collect the sufficient
 		 * statistics for rescoring. Create the MeteorStats list and the TER
@@ -452,7 +462,6 @@ public class Trainer {
 			if (tstFile.endsWith(".rank") || tstFile.endsWith(".ref.sgm"))
 				continue;
 			// ex: fr~1-en.system.sgm -> fr~1-en.ref.sgm
-			System.err.println(tstFile);
 			refFile = tstFile.substring(0, tstFile.indexOf(".")) + ".ref.sgm";
 			langPair = tstFile.substring(0, tstFile.indexOf("."));
 			sysName = tstFile.substring(tstFile.indexOf(".") + 1,
@@ -461,8 +470,11 @@ public class Trainer {
 			// Run Meteor with all modules
 			String test = dataDir + "/" + tstFile;
 			String ref = dataDir + "/" + refFile;
+			String[] mArgs = getMArgs(test, ref, paraFile, charBased, noNorm,
+					multi);
 
-			Meteor.main(getMArgs(test, ref, paraFile, charBased, noNorm));
+			System.err.println(Arrays.toString(mArgs));
+			Meteor.main(mArgs);
 
 			if (!segIdx.containsKey(langPair))
 				segIdx.put(langPair,
@@ -645,7 +657,7 @@ public class Trainer {
 	}
 
 	private static String[] getMArgs(String testFile, String refFile,
-			String paraFile, boolean charBased, boolean noNorm) {
+			String paraFile, boolean charBased, boolean noNorm, boolean multi) {
 
 		int langID = Constants.getLanguageID(Constants
 				.normLanguageName(language));
@@ -669,10 +681,32 @@ public class Trainer {
 			mArgs = Arrays.copyOf(mArgs, mArgs.length + 1);
 			mArgs[mArgs.length - 1] = "-ch";
 		}
-        if (!noNorm) {
-            mArgs = Arrays.copyOf(mArgs, mArgs.length + 1);
-            mArgs[mArgs.length - 1] = "-norm";
-        }
+		if (!noNorm) {
+			mArgs = Arrays.copyOf(mArgs, mArgs.length + 1);
+			mArgs[mArgs.length - 1] = "-norm";
+		}
+		// Overrides everything
+		if (multi) {
+			// fr~1-en.system.sgm -> en
+			String basename = (new File(testFile)).getName();
+			String lang = basename.substring(basename.indexOf("-") + 1,
+					basename.indexOf("-") + 3);
+			String[] multiArgs = {
+					testFile,
+					refFile,
+					"-sgml",
+					"-ssOut",
+					"-l",
+					lang,
+					"-m",
+					"exact paraphrase",
+					"-a",
+					Constants.getDefaultParaFileURL(
+							Constants.getLanguageID(Constants
+									.normLanguageName(lang))).getFile(), "-w",
+					"1.0 0.5", "-p", "0.5 0.5 0.5 0.5", "-lower" };
+			return multiArgs;
+		}
 		return mArgs;
 	}
 }
