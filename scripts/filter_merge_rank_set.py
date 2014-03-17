@@ -7,7 +7,7 @@
 # Filtering is highly recommended even for single sets to greatly reduce
 # training time.
 
-import codecs, os, re, sys
+import os, re, sys
 
 def main(argv):
     
@@ -25,8 +25,8 @@ def main(argv):
         sys.exit(1)
     
     # Single rank file
-    r_out = codecs.open(os.path.join(clean_dir, os.path.basename(r_files[0])),
-          'w', 'utf-8')
+    r_out = open(os.path.join(clean_dir, os.path.basename(r_files[0])),
+          'w')
     
     r_n = 0
     id = 0
@@ -38,7 +38,7 @@ def main(argv):
         
         # Renumber segments in rank file, keep order
         seg = {}
-        r_in = codecs.open(r_file, 'r', 'utf-8')
+        r_in = open(r_file, 'r')
         for line in r_in:
             f = line.split()
             if f[0] not in seg:
@@ -57,10 +57,10 @@ def main(argv):
         for sgm_file in os.listdir(f_dir):
             if not (sgm_file.startswith(prefix) and sgm_file.endswith('.sgm')):
                 continue
-            sgm_in = codecs.open(os.path.join(f_dir, sgm_file), 'r', 'utf-8')
+            sgm_in = open(os.path.join(f_dir, sgm_file), 'r')
             # Append rank set numbers to system names
-            sgm_out = codecs.open(os.path.join(clean_dir,
-              append_n(sgm_file, r_n)), 'w', 'utf-8')
+            sgm_out = open(os.path.join(clean_dir,
+              append_n(sgm_file, r_n)), 'w')
             for line in sgm_in:
                 r = re.search(u'^<seg id="([0-9]+)">', line, re.I)
                 if not r:
