@@ -686,7 +686,7 @@ public class Meteor {
 				props.setProperty("beamSize", args[curArg + 1]);
 				curArg += 2;
 			} else if (args[curArg].equals("-s")) {
-				props.setProperty("wordDir", args[curArg + 1]);
+				props.setProperty("wordFile", args[curArg + 1]);
 				curArg += 2;
 			} else if (args[curArg].equals("-d")) {
 				props.setProperty("synDir", args[curArg + 1]);
@@ -696,6 +696,10 @@ public class Meteor {
 				curArg += 2;
 			} else if (args[curArg].equals("-f")) {
 				props.setProperty("filePrefix", args[curArg + 1]);
+				curArg += 2;
+			} else if (args[curArg].equals("-new")) {
+				props.setProperty("newLang", "true");
+				props.setProperty("filesDir", args[curArg + 1]);
 				curArg += 2;
 			} else if (args[curArg].equals("-ch")) {
 				props.setProperty("charBased", "true");
@@ -772,7 +776,7 @@ public class Meteor {
 				.println("-r refCount                     Number of references (plaintext only)");
 		System.err.println("-x beamSize                     (default 40)");
 		System.err
-				.println("-s wordListDirectory            (if not default for language)");
+				.println("-s wordListFile                 (if not default for language)");
 		System.err
 				.println("-d synonymDirectory             (if not default for language)");
 		System.err
@@ -783,6 +787,9 @@ public class Meteor {
 				.println("-q                              Quiet: Segment scores to stderr, final to stdout,");
 		System.err
 				.println("                                  no additional output (plaintext only)");
+		System.err
+				.println("-new files-dir                  New language! (files-dir contains function.words and paraphrase.gz)");
+		System.err.println("                                  implies -lower");
 		System.err
 				.println("-ch                             Character-based precision and recall");
 		System.err
@@ -816,7 +823,10 @@ public class Meteor {
 		System.err.println("Sample options for SGML: -l <lang> -norm -sgml");
 		System.err
 				.println("Sample options for raw output / pretokenized references: -l <lang> -lower");
+		System.err
+				.println("Sample options for new language (plaintext): -new meteor-files");
 		System.err.println();
+
 		System.err.println("See README file for additional information");
 	}
 }

@@ -118,7 +118,7 @@ public class Constants {
 			supportedLangIDs.add(LANG_FR);
 			supportedLangIDs.add(LANG_ES);
 			supportedLangIDs.add(LANG_DE);
-            supportedLangIDs.add(LANG_RU);
+			supportedLangIDs.add(LANG_RU);
 		}
 		return supportedLangIDs.contains(langID);
 	}
@@ -319,6 +319,11 @@ public class Constants {
 	public static final double PARAM_TUNE[] = { 0.5, 1.0, 0.5, 0.5 };
 	public static final double WEIGHT_TUNE[] = { 1.0, 0.5, 0.5, 0.5 };
 
+	/* Universal task */
+	public static final int TASK_UNIVERSAL = 101;
+	public static final double PARAM_U[] = { 0, 0, 0, 0 };
+	public static final double WEIGHT_U[] = { 0, 0, 0, 0 };
+
 	// Cannot be used to set task, only used when options are specified manually
 	public static final int TASK_CUSTOM = -1;
 
@@ -356,6 +361,17 @@ public class Constants {
 		} catch (MalformedURLException ex) {
 			throw new RuntimeException();
 		}
+	}
+
+	public static URL getDefaultWordFileURL(int langID) throws RuntimeException {
+		String lang = getLanguageName(langID);
+		try {
+			return new URL(DEFAULT_WORD_DIR_URL.toString() + "/" + lang
+					+ ".words");
+		} catch (MalformedURLException ex) {
+			throw new RuntimeException();
+		}
+
 	}
 
 	public static String normLanguageName(String language)
@@ -606,6 +622,8 @@ public class Constants {
 			return TASK_TUNE;
 		if (task.equals("util"))
 			return TASK_UTIL;
+		if (task.equals("universal"))
+			return TASK_UNIVERSAL;
 		if (task.startsWith("custom"))
 			return TASK_CUSTOM;
 		// Not found
@@ -625,6 +643,8 @@ public class Constants {
 			return "tune";
 		if (task == TASK_UTIL)
 			return "util";
+		if (task == TASK_UNIVERSAL)
+			return "universal";
 		if (task == TASK_CUSTOM)
 			return "custom";
 		// Not found
@@ -649,6 +669,8 @@ public class Constants {
 			return "Tune";
 		if (task == TASK_UTIL)
 			return "Translator-Utility";
+		if (task == TASK_UNIVERSAL)
+			return "Universal";
 		if (task == TASK_CUSTOM)
 			return "Custom";
 		// Not found
@@ -659,7 +681,10 @@ public class Constants {
 
 		// Get task
 		double[] TASK_PARAM;
-		if (langID == LANG_OTHER || taskID == TASK_LI) {
+		// Order: universal, other/li, lang
+		if (taskID == TASK_UNIVERSAL) {
+			TASK_PARAM = PARAM_U;
+		} else if (langID == LANG_OTHER || taskID == TASK_LI) {
 			TASK_PARAM = PARAM_I;
 		} else if (taskID == TASK_TUNE) {
 			TASK_PARAM = PARAM_TUNE;
@@ -691,7 +716,10 @@ public class Constants {
 
 		// Get task
 		double[] TASK_WEIGHT;
-		if (langID == LANG_OTHER || taskID == TASK_LI) {
+		// Order: universal, other/li, lang
+		if (taskID == TASK_UNIVERSAL) {
+			TASK_WEIGHT = WEIGHT_U;
+		} else if (langID == LANG_OTHER || taskID == TASK_LI) {
 			TASK_WEIGHT = WEIGHT_I;
 		} else if (taskID == TASK_TUNE) {
 			TASK_WEIGHT = WEIGHT_TUNE;
@@ -772,7 +800,11 @@ public class Constants {
 	public static ArrayList<Integer> getModules(int langID, int taskID)
 			throws RuntimeException {
 		ArrayList<Integer> modules = new ArrayList<Integer>();
-		if (langID == LANG_EN) {
+		// Universal overrised language
+		if (taskID == TASK_UNIVERSAL) {
+			modules.add(MODULE_EXACT);
+			modules.add(MODULE_PARAPHRASE);
+		} else if (langID == LANG_EN) {
 			modules.add(MODULE_EXACT);
 			modules.add(MODULE_STEM);
 			modules.add(MODULE_SYNONYM);
@@ -801,7 +833,7 @@ public class Constants {
 		} else if (langID == LANG_RU) {
 			modules.add(MODULE_EXACT);
 			modules.add(MODULE_STEM);
-            modules.add(MODULE_PARAPHRASE);
+			modules.add(MODULE_PARAPHRASE);
 		} else if (langID == LANG_DA) {
 			modules.add(MODULE_EXACT);
 			modules.add(MODULE_STEM);

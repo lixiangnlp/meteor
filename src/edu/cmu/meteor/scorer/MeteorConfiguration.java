@@ -44,7 +44,7 @@ public class MeteorConfiguration {
 	private ArrayList<Integer> modules;
 	private ArrayList<Double> moduleWeights;
 	private int beamSize;
-	private URL wordDirURL;
+	private URL wordFileURL;
 	private URL synDirURL;
 	private URL paraDirURL;
 	private boolean charBased;
@@ -60,7 +60,7 @@ public class MeteorConfiguration {
 		setLanguage("english");
 		setTask("default");
 		setBeamSize(Constants.DEFAULT_BEAM_SIZE);
-		setWordDirURL(Constants.DEFAULT_WORD_DIR_URL);
+		setWordFileURL(Constants.getDefaultWordFileURL(langID));
 		setSynDirURL(Constants.DEFAULT_SYN_DIR_URL);
 		setParaFileURL(Constants.getDefaultParaFileURL(langID));
 		setNormalization(Constants.NO_NORMALIZE);
@@ -115,6 +115,7 @@ public class MeteorConfiguration {
 	 * @param task
 	 */
 	public void setTask(String task) {
+		System.out.println(Constants.getTaskID(task));
 		setTask(Constants.getTaskID(task));
 	}
 
@@ -209,14 +210,14 @@ public class MeteorConfiguration {
 		this.moduleWeights = new ArrayList<Double>(moduleScores);
 	}
 
-	public URL getWordDirURL() {
-		return wordDirURL;
+	public URL getWordFileURL() {
+		return wordFileURL;
 	}
 
-	public void setWordDirURL(URL wordDirURL) {
+	public void setWordFileURL(URL wordFileURL) {
 		try {
 			// This should not ever throw a malformed url exception
-			this.wordDirURL = new URL(wordDirURL.toString());
+			this.wordFileURL = new URL(wordFileURL.toString());
 		} catch (MalformedURLException ex) {
 			System.err.println("Error: Word list directory URL NOT set");
 			ex.printStackTrace();
@@ -265,6 +266,21 @@ public class MeteorConfiguration {
 
 	public void setCharBased(boolean charBased) {
 		this.charBased = charBased;
+	}
+
+	public void newLang(String filesDir) {
+		setLanguage("other");
+		setTask("universal");
+		try {
+			setWordFileURL((new File(filesDir, "function.words")).toURI()
+					.toURL());
+			setParaFileURL((new File(filesDir, "paraphrase.gz")).toURI()
+					.toURL());
+		} catch (MalformedURLException ex) {
+			System.err.println("Error: files NOT set");
+			ex.printStackTrace();
+		}
+		setNormalization(Constants.NORMALIZE_LC_ONLY);
 	}
 
 	// Integration with Java properties
@@ -327,12 +343,12 @@ public class MeteorConfiguration {
 		if (beamSize != null)
 			setBeamSize(Integer.parseInt(beamSize));
 
-		// Word list dir
-		String wordDir = (props.getProperty("wordDir"));
-		if (wordDir != null)
+		// Word list file
+		String wordFile = (props.getProperty("wordFile"));
+		if (wordFile != null)
 			try {
 				// This should not ever throw a malformed url exception
-				setWordDirURL((new File(wordDir)).toURI().toURL());
+				setWordFileURL((new File(wordFile)).toURI().toURL());
 			} catch (MalformedURLException ex) {
 				System.err.println("Error: Word list directory URL NOT set");
 				ex.printStackTrace();
@@ -383,5 +399,11 @@ public class MeteorConfiguration {
 		Boolean charBased = Boolean
 				.parseBoolean(props.getProperty("charBased"));
 		setCharBased(charBased);
+
+		// New language overrides other options
+		Boolean newLang = Boolean.parseBoolean(props.getProperty("newLang"));
+		if (newLang) {
+			newLang(props.getProperty("filesDir"));
+		}
 	}
 }

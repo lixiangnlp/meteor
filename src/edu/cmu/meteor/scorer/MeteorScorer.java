@@ -101,11 +101,10 @@ public class MeteorScorer {
 		moduleWeights = config.getModuleWeights();
 		aligner = new Aligner(language, config.getModules(),
 				config.getModuleWeights(), config.getBeamSize(),
-				config.getWordDirURL(), config.getSynDirURL(),
+				config.getWordFileURL(), config.getSynDirURL(),
 				config.getParaDirURL(),
 				// Best alignments for evaluation
 				Constants.PARTIAL_COMPARE_TOTAL);
-
 		// Best weights for evaluation
 		ArrayList<Integer> modules = config.getModules();
 		ArrayList<Double> setWeights = new ArrayList<Double>();
