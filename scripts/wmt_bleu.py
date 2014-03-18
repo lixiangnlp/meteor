@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Read Meteor output, write to WMT score format
+# Score with BLEU, produce WMT score files
 
 import os, subprocess, sys
 

@@ -6,7 +6,7 @@
 
     <head>
         <meta charset="utf-8">
-        <title>Meteor 1.4 README</title>
+        <title>Meteor 1.5 README</title>
         <style media="all" type="text/css">
             body {
                 background: #000000;
@@ -91,7 +91,7 @@
 
     <body>
         <div id="page">
-            <h1>Meteor 1.4: Automatic Machine Translation Evaluation System</h1>
+            <h1>Meteor 1.5: Automatic Machine Translation Evaluation System</h1>
             <h4>Code by <a target="_blank" href="http://www.cs.cmu.edu/~mdenkows/">Michael Denkowski</a></h4>
             <h4><a class="padded" target="_blank" href="http://www.cs.cmu.edu/~alavie/METEOR/">Website</a><a class="padded" target="_blank" href="http://github.com/mjdenkowski/meteor">Github</a></h4>
 
@@ -105,7 +105,8 @@
             <a href="#integration">7. Integrating Meteor with your Software</a><br />
             <a href="#xray">8. Meteor X-ray</a><br />
             <a href="#training">9. Training Meteor Parameters</a><br />
-            <a href="#thanks">10. Special Thanks</a><br />
+            <a href="#universal">10. Meteor Universal: Evaluation for Any Language</a><br />
+            <a href="#thanks">11. Special Thanks</a><br />
 
             <h3><a name="about"></a>1. About</h3>
             <p>
@@ -719,7 +720,30 @@ python scripts/meteor_shower.py meteor-*.jar en 4 rank my-train-dir work-dir 8 -
                 Make sure to specify an absolute path for the paraphrase file.
                 The results will be written to work-dir, along with a script for sorting the results.    
             </p>
-            <h3><a name="thanks"></a>10. Special Thanks</h3>
+            <h3><a name="universal"></a>10. Meteor Universal: Evaluation for Any Language</h3>
+            <p>
+            Meteor now supports language-specific evaluation for any target language for which there is enough data to build a standard phrase-based machine translation system.
+            To build language-specific resources (paraphrase table and function word list), run the new_language.py script with your parallel data and a Moses-format phrase table:
+<pre>
+python scripts/new_language.py out-dir corpus.f corpus.e phrase-table.gz [target-corpus.e]
+</pre>
+            Paraphrases will be extracted matching the target corpus (this can be a collection of relevant dev sets).
+            If no target corpus is provided, the first 10,000 lines of the English corpus will be used (in practice this works adequately).
+            Meteor can then be run with these files:
+<pre>
+java -Xmx2G -jar meteor-*.jar test reference -new out-dir/meteor-files
+</pre>
+            Data should be pre-tokenized.
+            Meteor will lowercase all data for evaluation (-new implies -lower).
+            A universal parameter set will be used.
+            These parameters are tuned on over 100,000 binary ranking judgments across 8 language directions and encode the following general properties:
+            <ul>
+                <li>Preference for recall over precision</li>
+                <li>Preference for word choice over word order</li>
+                <li>Preference for correct content words over correct function words</li>
+            </ul>
+            </p>
+            <h3><a name="thanks"></a>11. Special Thanks</h3>
             <p>
                 Authors of previous Meteor versions:
                 <ul>
