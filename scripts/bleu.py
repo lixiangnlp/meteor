@@ -48,6 +48,8 @@ def sgm(f_in, f_out, f_type, char=False):
     print >> o, '<{0} trglang="trg" setid="set" srclang="src">'.format(f_type)
     print >> o, '<doc docid="doc" sysid="sys">'
     for line in i:
+        # Strip invalid utf-8
+        line = line.decode('utf-8', errors='ignore').encode('utf-8')
         s += 1
         if char:
             line = ' '.join([ch for ch in line if ch != ' '])

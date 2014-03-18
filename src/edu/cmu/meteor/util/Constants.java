@@ -321,8 +321,8 @@ public class Constants {
 
 	/* Universal task */
 	public static final int TASK_UNIVERSAL = 101;
-	public static final double PARAM_U[] = { 0, 0, 0, 0 };
-	public static final double WEIGHT_U[] = { 0, 0, 0, 0 };
+	public static final double PARAM_U[] = { 0.70, 1.40, 0.30, 0.70 };
+	public static final double WEIGHT_U[] = { 1.0, 0.6, 0, 0 };
 
 	// Cannot be used to set task, only used when options are specified manually
 	public static final int TASK_CUSTOM = -1;
