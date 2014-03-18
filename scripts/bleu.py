@@ -2,7 +2,7 @@
 
 import os, shutil, subprocess, sys, tempfile
 
-mteval_pl = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'mt-diff', 'files', 'mteval-v13m.pl'))
+mteval_pl = os.path.abspath(os.path.join(os.path.dirname(__file__), 'mteval-v13m.pl'))
 
 def main(argv):
     
