@@ -10,6 +10,7 @@
 package edu.cmu.meteor.scorer;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import edu.cmu.meteor.aligner.Alignment;
@@ -234,48 +235,97 @@ public class MeteorStats {
 	 * @param ssString
 	 */
 	public MeteorStats(String ssString) {
-		Scanner s = new Scanner(ssString);
+		try {
+			Scanner s = new Scanner(ssString);
 
-		testLength = s.nextInt();
-		referenceLength = s.nextInt();
+			testLength = s.nextInt();
+			referenceLength = s.nextInt();
 
-		testFunctionWords = s.nextInt();
-		referenceFunctionWords = s.nextInt();
+			testFunctionWords = s.nextInt();
+			referenceFunctionWords = s.nextInt();
 
-		testTotalMatches = 0;
-		referenceTotalMatches = 0;
+			testTotalMatches = 0;
+			referenceTotalMatches = 0;
 
-		testStageMatchesContent = new ArrayList<Integer>();
-		referenceStageMatchesContent = new ArrayList<Integer>();
+			testStageMatchesContent = new ArrayList<Integer>();
+			referenceStageMatchesContent = new ArrayList<Integer>();
 
-		testStageMatchesFunction = new ArrayList<Integer>();
-		referenceStageMatchesFunction = new ArrayList<Integer>();
+			testStageMatchesFunction = new ArrayList<Integer>();
+			referenceStageMatchesFunction = new ArrayList<Integer>();
 
-		for (int i = 0; i < Constants.MAX_MODULES; i++) {
+			for (int i = 0; i < Constants.MAX_MODULES; i++) {
 
-			int tstC = s.nextInt();
-			int refC = s.nextInt();
+				int tstC = s.nextInt();
+				int refC = s.nextInt();
 
-			testTotalMatches += tstC;
-			referenceTotalMatches += refC;
+				testTotalMatches += tstC;
+				referenceTotalMatches += refC;
 
-			testStageMatchesContent.add(tstC);
-			referenceStageMatchesContent.add(refC);
+				testStageMatchesContent.add(tstC);
+				referenceStageMatchesContent.add(refC);
 
-			int tstF = s.nextInt();
-			int refF = s.nextInt();
+				int tstF = s.nextInt();
+				int refF = s.nextInt();
 
-			testTotalMatches += tstF;
-			referenceTotalMatches += refF;
+				testTotalMatches += tstF;
+				referenceTotalMatches += refF;
 
-			testStageMatchesFunction.add(tstF);
-			referenceStageMatchesFunction.add(refF);
+				testStageMatchesFunction.add(tstF);
+				referenceStageMatchesFunction.add(refF);
+			}
+
+			chunks = s.nextInt();
+
+			testWordMatches = s.nextInt();
+			referenceWordMatches = s.nextInt();
+			// This wants to be refactored badly
+		} catch (InputMismatchException ex) {
+			System.err.println("Line does not consist of ints: " + ssString);
+			Scanner s = new Scanner(ssString);
+
+			testLength = (int) Math.round(s.nextDouble());
+			referenceLength = (int) Math.round(s.nextDouble());
+
+			testFunctionWords = (int) Math.round(s.nextDouble());
+			referenceFunctionWords = (int) Math.round(s.nextDouble());
+
+			testTotalMatches = 0;
+			referenceTotalMatches = 0;
+
+			testStageMatchesContent = new ArrayList<Integer>();
+			referenceStageMatchesContent = new ArrayList<Integer>();
+
+			testStageMatchesFunction = new ArrayList<Integer>();
+			referenceStageMatchesFunction = new ArrayList<Integer>();
+
+			for (int i = 0; i < Constants.MAX_MODULES; i++) {
+
+				int tstC = (int) Math.round(s.nextDouble());
+				int refC = (int) Math.round(s.nextDouble());
+
+				testTotalMatches += tstC;
+				referenceTotalMatches += refC;
+
+				testStageMatchesContent.add(tstC);
+				referenceStageMatchesContent.add(refC);
+
+				int tstF = (int) Math.round(s.nextDouble());
+				int refF = (int) Math.round(s.nextDouble());
+
+				testTotalMatches += tstF;
+				referenceTotalMatches += refF;
+
+				testStageMatchesFunction.add(tstF);
+				referenceStageMatchesFunction.add(refF);
+			}
+
+			chunks = (int) Math.round(s.nextDouble());
+
+			testWordMatches = (int) Math.round(s.nextDouble());
+			referenceWordMatches = (int) Math.round(s.nextDouble());
+
+			System.err.println("Turned line into: " + toString());
 		}
-
-		chunks = s.nextInt();
-
-		testWordMatches = s.nextInt();
-		referenceWordMatches = s.nextInt();
 	}
 
 	/**
