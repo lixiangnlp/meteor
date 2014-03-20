@@ -265,7 +265,7 @@ public class Constants {
 	public static final int TASK_UTIL = 3;
 	public static final double PARAM_UTIL[][] = {
 			//
-			{ 0.0, 0.0, 0.0, 0.0 }, // English
+			{ 0.65, 0.1, 0.55, 0.65 }, // English
 			{ 0.0, 0.0, 0.0, 0.0 }, // Czech
 			{ 0.0, 0.0, 0.0, 0.0 }, // French
 			{ 0.0, 0.0, 0.0, 0.0 }, // Spanish
@@ -285,7 +285,7 @@ public class Constants {
 	};
 	public static final double WEIGHT_UTIL[][] = {
 			//
-			{ 0.0, 0.0, 0.0, 0.0 }, // English
+			{ 1.0, 0.0, 0.0, 0.8 }, // English
 			{ 0.0, 0.0, 0.0, 0.0 }, // Czech
 			{ 0.0, 0.0, 0.0, 0.0 }, // French
 			{ 0.0, 0.0, 0.0, 0.0 }, // Spanish
