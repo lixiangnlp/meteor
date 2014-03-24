@@ -286,12 +286,14 @@ public class MeteorScorer {
 				}
 			}
 			for (int i = 0; i < alignment.moduleContentMatches1.size(); i++) {
-				stats.testStageMatchesContent.add(testStageMatchesContent[i]);
+				stats.testStageMatchesContent
+						.add((double) testStageMatchesContent[i]);
 				stats.referenceStageMatchesContent
-						.add(referenceStageMatchesContent[i]);
-				stats.testStageMatchesFunction.add(testStageMatchesFunction[i]);
+						.add((double) referenceStageMatchesContent[i]);
+				stats.testStageMatchesFunction
+						.add((double) testStageMatchesFunction[i]);
 				stats.referenceStageMatchesFunction
-						.add(referenceStageMatchesFunction[i]);
+						.add((double) referenceStageMatchesFunction[i]);
 			}
 		}
 		// Otherwise use word counts
@@ -301,14 +303,22 @@ public class MeteorScorer {
 			stats.testFunctionWords = alignment.line1FunctionWords.size();
 			stats.referenceFunctionWords = alignment.line2FunctionWords.size();
 
-			stats.testStageMatchesContent = new ArrayList<Integer>(
-					alignment.moduleContentMatches1);
-			stats.referenceStageMatchesContent = new ArrayList<Integer>(
-					alignment.moduleContentMatches2);
-			stats.testStageMatchesFunction = new ArrayList<Integer>(
-					alignment.moduleFunctionMatches1);
-			stats.referenceStageMatchesFunction = new ArrayList<Integer>(
-					alignment.moduleFunctionMatches2);
+			stats.testStageMatchesContent = new ArrayList<Double>();
+			for (int i = 0; i < alignment.moduleContentMatches1.size(); stats.testStageMatchesContent
+					.add((double) alignment.moduleContentMatches1.get(i++)))
+				;
+			stats.referenceStageMatchesContent = new ArrayList<Double>();
+			for (int i = 0; i < alignment.moduleContentMatches2.size(); stats.referenceStageMatchesContent
+					.add((double) alignment.moduleContentMatches2.get(i++)))
+				;
+			stats.testStageMatchesFunction = new ArrayList<Double>();
+			for (int i = 0; i < alignment.moduleFunctionMatches1.size(); stats.testStageMatchesFunction
+					.add((double) alignment.moduleFunctionMatches1.get(i++)))
+				;
+			stats.referenceStageMatchesFunction = new ArrayList<Double>();
+			for (int i = 0; i < alignment.moduleFunctionMatches2.size(); stats.referenceStageMatchesFunction
+					.add((double) alignment.moduleFunctionMatches2.get(i++)))
+				;
 		}
 
 		// Same for word and character level

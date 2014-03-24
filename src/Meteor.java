@@ -615,21 +615,36 @@ public class Meteor {
 		System.out
 				.println("Stage      Content  Function    Total    Content  Function    Total");
 		ArrayList<Double> weights = config.getModuleWeights();
-		int testContentMatches = 0;
-		int testFunctionMatches = 0;
-		int referenceContentMatches = 0;
-		int referenceFunctionMatches = 0;
+		double testContentMatches = 0.0;
+		double testFunctionMatches = 0.0;
+		double referenceContentMatches = 0.0;
+		double referenceFunctionMatches = 0.0;
 		for (int i = 0; i < weights.size(); i++) {
-			System.out.println(String.format(
-					"%1d          %7d   %7d  %7d    %7d   %7d  %7d", i + 1,
-					stats.testStageMatchesContent.get(i),
-					stats.testStageMatchesFunction.get(i),
-					stats.testStageMatchesContent.get(i)
-							+ stats.testStageMatchesFunction.get(i),
-					stats.referenceStageMatchesContent.get(i),
-					stats.referenceStageMatchesFunction.get(i),
-					stats.referenceStageMatchesContent.get(i)
-							+ stats.referenceStageMatchesFunction.get(i)));
+			System.out
+					.println(String.format(
+							"%1d          %7s   %7s  %7s    %7s   %7s  %7s",
+							i + 1,
+							Constants.minFormat
+									.format(stats.testStageMatchesContent
+											.get(i)),
+							Constants.minFormat
+									.format(stats.testStageMatchesFunction
+											.get(i)),
+							Constants.minFormat
+									.format(stats.testStageMatchesContent
+											.get(i)
+											+ stats.testStageMatchesFunction
+													.get(i)),
+							Constants.minFormat
+									.format(stats.referenceStageMatchesContent
+											.get(i)),
+							Constants.minFormat
+									.format(stats.referenceStageMatchesFunction
+											.get(i)),
+							Constants.minFormat.format(stats.referenceStageMatchesContent
+									.get(i)
+									+ stats.referenceStageMatchesFunction
+											.get(i))));
 			testContentMatches += stats.testStageMatchesContent.get(i);
 			testFunctionMatches += stats.testStageMatchesFunction.get(i);
 			referenceContentMatches += stats.referenceStageMatchesContent
@@ -638,18 +653,24 @@ public class Meteor {
 					.get(i);
 		}
 		System.out.println(String.format(
-				"Total      %7d   %7d  %7d    %7d   %7d  %7d",
-				testContentMatches, testFunctionMatches, testContentMatches
-						+ testFunctionMatches, referenceContentMatches,
-				referenceFunctionMatches, referenceContentMatches
-						+ referenceFunctionMatches));
+				"Total      %7s   %7s  %7s    %7s   %7s  %7s",
+				Constants.minFormat.format(testContentMatches),
+				Constants.minFormat.format(testFunctionMatches),
+				Constants.minFormat.format(testContentMatches
+						+ testFunctionMatches),
+				Constants.minFormat.format(referenceContentMatches),
+				Constants.minFormat.format(referenceFunctionMatches),
+				Constants.minFormat.format(referenceContentMatches
+						+ referenceFunctionMatches)));
 		System.out.println();
 		System.out.println("Test " + (config.getCharBased() ? "char" : "word")
-				+ "s:             " + stats.testLength);
+				+ "s:             "
+				+ Constants.minFormat.format(stats.testLength));
 		System.out.println("Reference "
 				+ (config.getCharBased() ? "char" : "word") + "s:        "
-				+ stats.referenceLength);
-		System.out.println("Chunks:                 " + stats.chunks);
+				+ Constants.minFormat.format(stats.referenceLength));
+		System.out.println("Chunks:                 "
+				+ Constants.minFormat.format(stats.chunks));
 		System.out.println("Precision:              " + stats.precision);
 		System.out.println("Recall:                 " + stats.recall);
 		System.out.println("f1:                     " + stats.f1);

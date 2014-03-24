@@ -26,26 +26,26 @@ public class MeteorStats {
 
 	/* Aggregable statistics */
 
-	public int testLength;
-	public int referenceLength;
+	public double testLength;
+	public double referenceLength;
 
-	public int testFunctionWords;
-	public int referenceFunctionWords;
+	public double testFunctionWords;
+	public double referenceFunctionWords;
 
-	public int testTotalMatches;
-	public int referenceTotalMatches;
+	public double testTotalMatches;
+	public double referenceTotalMatches;
 
-	public ArrayList<Integer> testStageMatchesContent;
-	public ArrayList<Integer> referenceStageMatchesContent;
+	public ArrayList<Double> testStageMatchesContent;
+	public ArrayList<Double> referenceStageMatchesContent;
 
-	public ArrayList<Integer> testStageMatchesFunction;
-	public ArrayList<Integer> referenceStageMatchesFunction;
+	public ArrayList<Double> testStageMatchesFunction;
+	public ArrayList<Double> referenceStageMatchesFunction;
 
-	public int chunks;
+	public double chunks;
 
 	// Different in case of character-based evaluation
-	public int testWordMatches;
-	public int referenceWordMatches;
+	public double testWordMatches;
+	public double referenceWordMatches;
 
 	/* Calculated statistics */
 
@@ -75,31 +75,31 @@ public class MeteorStats {
 	public Alignment alignment;
 
 	public MeteorStats() {
-		testLength = 0;
-		referenceLength = 0;
+		testLength = 0.0;
+		referenceLength = 0.0;
 
-		testFunctionWords = 0;
-		referenceFunctionWords = 0;
+		testFunctionWords = 0.0;
+		referenceFunctionWords = 0.0;
 
-		testTotalMatches = 0;
-		referenceTotalMatches = 0;
+		testTotalMatches = 0.0;
+		referenceTotalMatches = 0.0;
 
-		testStageMatchesContent = new ArrayList<Integer>();
-		referenceStageMatchesContent = new ArrayList<Integer>();
+		testStageMatchesContent = new ArrayList<Double>();
+		referenceStageMatchesContent = new ArrayList<Double>();
 
-		testStageMatchesFunction = new ArrayList<Integer>();
-		referenceStageMatchesFunction = new ArrayList<Integer>();
+		testStageMatchesFunction = new ArrayList<Double>();
+		referenceStageMatchesFunction = new ArrayList<Double>();
 
-		chunks = 0;
+		chunks = 0.0;
 
-		testWordMatches = 0;
-		referenceWordMatches = 0;
+		testWordMatches = 0.0;
+		referenceWordMatches = 0.0;
 
-		testWeightedMatches = 0;
-		referenceWeightedMatches = 0;
+		testWeightedMatches = 0.0;
+		referenceWeightedMatches = 0.0;
 
-		testWeightedLength = 0;
-		referenceWeightedLength = 0;
+		testWeightedLength = 0.0;
+		referenceWeightedLength = 0.0;
 	}
 
 	/**
@@ -121,10 +121,10 @@ public class MeteorStats {
 		int sizeDiff = ss.referenceStageMatchesContent.size()
 				- referenceStageMatchesContent.size();
 		for (int i = 0; i < sizeDiff; i++) {
-			testStageMatchesContent.add(0);
-			referenceStageMatchesContent.add(0);
-			testStageMatchesFunction.add(0);
-			referenceStageMatchesFunction.add(0);
+			testStageMatchesContent.add(0.0);
+			referenceStageMatchesContent.add(0.0);
+			testStageMatchesFunction.add(0.0);
+			referenceStageMatchesFunction.add(0.0);
 		}
 		for (int i = 0; i < ss.testStageMatchesContent.size(); i++)
 			testStageMatchesContent.set(i, testStageMatchesContent.get(i)
@@ -142,7 +142,7 @@ public class MeteorStats {
 							+ ss.referenceStageMatchesFunction.get(i));
 
 		if (!(ss.testTotalMatches == ss.testLength
-				&& ss.referenceTotalMatches == ss.referenceLength && ss.chunks == 1))
+				&& ss.referenceTotalMatches == ss.referenceLength && ss.chunks == 1.0))
 			chunks += ss.chunks;
 
 		testWordMatches += ss.testWordMatches;
@@ -176,10 +176,10 @@ public class MeteorStats {
 				sb.append(testStageMatchesFunction.get(i) + delim);
 				sb.append(referenceStageMatchesFunction.get(i) + delim);
 			} else {
-				sb.append(0 + delim);
-				sb.append(0 + delim);
-				sb.append(0 + delim);
-				sb.append(0 + delim);
+				sb.append(0.0 + delim);
+				sb.append(0.0 + delim);
+				sb.append(0.0 + delim);
+				sb.append(0.0 + delim);
 			}
 		}
 		sb.append(chunks + delim);
@@ -193,168 +193,32 @@ public class MeteorStats {
 	}
 
 	/**
-	 * Some MERT implementations use int[] for sufficient statistics
-	 * 
-	 */
-
-	// Does not matter for integers. If future stats require floats, higher
-	// scale factor improves precision
-	public static final int SCALE_FACTOR = 1;
-
-	public int[] toIntArray() {
-		int[] stats = new int[STATS_LENGTH];
-		int idx = 0;
-		stats[idx++] = testLength * SCALE_FACTOR;
-		stats[idx++] = referenceLength * SCALE_FACTOR;
-		stats[idx++] = testFunctionWords * SCALE_FACTOR;
-		stats[idx++] = referenceFunctionWords * SCALE_FACTOR;
-		for (int i = 0; i < Constants.MAX_MODULES; i++) {
-			if (i < testStageMatchesContent.size()) {
-				stats[idx++] = testStageMatchesContent.get(i) * SCALE_FACTOR;
-				stats[idx++] = referenceStageMatchesContent.get(i)
-						* SCALE_FACTOR;
-				stats[idx++] = testStageMatchesFunction.get(i) * SCALE_FACTOR;
-				stats[idx++] = referenceStageMatchesFunction.get(i)
-						* SCALE_FACTOR;
-			} else {
-				stats[idx++] = 0;
-				stats[idx++] = 0;
-				stats[idx++] = 0;
-				stats[idx++] = 0;
-			}
-		}
-		stats[idx++] = chunks * SCALE_FACTOR;
-		stats[idx++] = testWordMatches * SCALE_FACTOR;
-		stats[idx++] = referenceWordMatches * SCALE_FACTOR;
-		return stats;
-	}
-
-	/**
 	 * Use a string from the toString() method to create a MeteorStats object.
 	 * 
 	 * @param ssString
 	 */
 	public MeteorStats(String ssString) {
-		try {
-			Scanner s = new Scanner(ssString);
+		Scanner s = new Scanner(ssString);
 
-			testLength = s.nextInt();
-			referenceLength = s.nextInt();
+		testLength = s.nextDouble();
+		referenceLength = s.nextDouble();
 
-			testFunctionWords = s.nextInt();
-			referenceFunctionWords = s.nextInt();
+		testFunctionWords = s.nextDouble();
+		referenceFunctionWords = s.nextDouble();
 
-			testTotalMatches = 0;
-			referenceTotalMatches = 0;
+		testTotalMatches = 0.0;
+		referenceTotalMatches = 0.0;
 
-			testStageMatchesContent = new ArrayList<Integer>();
-			referenceStageMatchesContent = new ArrayList<Integer>();
+		testStageMatchesContent = new ArrayList<Double>();
+		referenceStageMatchesContent = new ArrayList<Double>();
 
-			testStageMatchesFunction = new ArrayList<Integer>();
-			referenceStageMatchesFunction = new ArrayList<Integer>();
-
-			for (int i = 0; i < Constants.MAX_MODULES; i++) {
-
-				int tstC = s.nextInt();
-				int refC = s.nextInt();
-
-				testTotalMatches += tstC;
-				referenceTotalMatches += refC;
-
-				testStageMatchesContent.add(tstC);
-				referenceStageMatchesContent.add(refC);
-
-				int tstF = s.nextInt();
-				int refF = s.nextInt();
-
-				testTotalMatches += tstF;
-				referenceTotalMatches += refF;
-
-				testStageMatchesFunction.add(tstF);
-				referenceStageMatchesFunction.add(refF);
-			}
-
-			chunks = s.nextInt();
-
-			testWordMatches = s.nextInt();
-			referenceWordMatches = s.nextInt();
-			// This wants to be refactored badly
-		} catch (InputMismatchException ex) {
-			System.err.println("Line does not consist of ints: " + ssString);
-			Scanner s = new Scanner(ssString);
-
-			testLength = (int) Math.round(s.nextDouble());
-			referenceLength = (int) Math.round(s.nextDouble());
-
-			testFunctionWords = (int) Math.round(s.nextDouble());
-			referenceFunctionWords = (int) Math.round(s.nextDouble());
-
-			testTotalMatches = 0;
-			referenceTotalMatches = 0;
-
-			testStageMatchesContent = new ArrayList<Integer>();
-			referenceStageMatchesContent = new ArrayList<Integer>();
-
-			testStageMatchesFunction = new ArrayList<Integer>();
-			referenceStageMatchesFunction = new ArrayList<Integer>();
-
-			for (int i = 0; i < Constants.MAX_MODULES; i++) {
-
-				int tstC = (int) Math.round(s.nextDouble());
-				int refC = (int) Math.round(s.nextDouble());
-
-				testTotalMatches += tstC;
-				referenceTotalMatches += refC;
-
-				testStageMatchesContent.add(tstC);
-				referenceStageMatchesContent.add(refC);
-
-				int tstF = (int) Math.round(s.nextDouble());
-				int refF = (int) Math.round(s.nextDouble());
-
-				testTotalMatches += tstF;
-				referenceTotalMatches += refF;
-
-				testStageMatchesFunction.add(tstF);
-				referenceStageMatchesFunction.add(refF);
-			}
-
-			chunks = (int) Math.round(s.nextDouble());
-
-			testWordMatches = (int) Math.round(s.nextDouble());
-			referenceWordMatches = (int) Math.round(s.nextDouble());
-
-			System.err.println("Turned line into: " + toString());
-		}
-	}
-
-	/**
-	 * Some MERT implementations use int[] for sufficient statistics
-	 * 
-	 * @param stats
-	 */
-	public MeteorStats(int[] stats) {
-		int idx = 0;
-
-		testLength = stats[idx++] / SCALE_FACTOR;
-		referenceLength = stats[idx++] / SCALE_FACTOR;
-
-		testFunctionWords = stats[idx++] / SCALE_FACTOR;
-		referenceFunctionWords = stats[idx++] / SCALE_FACTOR;
-
-		testTotalMatches = 0;
-		referenceTotalMatches = 0;
-
-		testStageMatchesContent = new ArrayList<Integer>();
-		referenceStageMatchesContent = new ArrayList<Integer>();
-
-		testStageMatchesFunction = new ArrayList<Integer>();
-		referenceStageMatchesFunction = new ArrayList<Integer>();
+		testStageMatchesFunction = new ArrayList<Double>();
+		referenceStageMatchesFunction = new ArrayList<Double>();
 
 		for (int i = 0; i < Constants.MAX_MODULES; i++) {
 
-			int tstC = stats[idx++] / SCALE_FACTOR;
-			int refC = stats[idx++] / SCALE_FACTOR;
+			double tstC = s.nextDouble();
+			double refC = s.nextDouble();
 
 			testTotalMatches += tstC;
 			referenceTotalMatches += refC;
@@ -362,8 +226,8 @@ public class MeteorStats {
 			testStageMatchesContent.add(tstC);
 			referenceStageMatchesContent.add(refC);
 
-			int tstF = stats[idx++] / SCALE_FACTOR;
-			int refF = stats[idx++] / SCALE_FACTOR;
+			double tstF = s.nextDouble();
+			double refF = s.nextDouble();
 
 			testTotalMatches += tstF;
 			referenceTotalMatches += refF;
@@ -372,9 +236,10 @@ public class MeteorStats {
 			referenceStageMatchesFunction.add(refF);
 		}
 
-		chunks = stats[idx++] / SCALE_FACTOR;
+		chunks = s.nextDouble();
 
-		testWordMatches = stats[idx++] / SCALE_FACTOR;
-		referenceWordMatches = stats[idx++] / SCALE_FACTOR;
+		testWordMatches = s.nextDouble();
+		referenceWordMatches = s.nextDouble();
 	}
+
 }

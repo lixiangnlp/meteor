@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -43,6 +44,9 @@ public class Constants {
 	/* Version */
 
 	public static final String VERSION = "1.5";
+
+	public static final DecimalFormat minFormat = new DecimalFormat(
+			"#.##########");
 
 	/*
 	 * Normalizer constants
