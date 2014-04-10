@@ -48,6 +48,12 @@ public class Matcher {
 					.println("-d synonymDirectory             (if not default)");
 			System.out
 					.println("-a paraphraseFile               (if not default)");
+			System.out
+					.println("-stdio                          Read lines from stdin");
+			System.out
+					.println("                                  sentence 1 ||| sentence 2");
+			System.out
+					.println("                                  use \"-\" for test and reference (Matcher - - -stdio)");
 			System.out.println();
 			System.out.println("See README file for examples");
 			return;
@@ -56,6 +62,7 @@ public class Matcher {
 		// Files
 		String test = args[0];
 		String ref = args[1];
+		boolean stdio = false;
 
 		Properties props = new Properties();
 
@@ -80,6 +87,9 @@ public class Matcher {
 			} else if (args[curArg].equals("-t")) {
 				props.setProperty("type", args[curArg + 1]);
 				curArg += 2;
+			} else if (args[curArg].equals("-stdio")) {
+				stdio = true;
+				curArg += 1;
 			} else {
 				System.err.println("Unknown option \"" + args[curArg] + "\"");
 				System.exit(1);
@@ -163,40 +173,59 @@ public class Matcher {
 
 		// Construct aligner
 		Aligner aligner = new Aligner(language, modules, moduleWeights,
-				beamSize, Constants.DEFAULT_WORD_DIR_URL, synURL, paraURL,
+				beamSize, Constants.getDefaultWordFileURL(Constants
+						.getLanguageID(language)), synURL, paraURL,
 				partialComparator);
 
-		// Open files
-		BufferedReader inTest = null;
-		BufferedReader inRef = null;
-		try {
-			inTest = new BufferedReader(new InputStreamReader(
-					new FileInputStream(test), "UTF-8"));
-			inRef = new BufferedReader(new InputStreamReader(
-					new FileInputStream(ref), "UTF-8"));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.exit(1);
-		}
-
-		// Read lines
-		String lineTest;
-		String lineRef;
-		int line = 0;
-		while ((lineTest = inTest.readLine()) != null) {
-			lineRef = inRef.readLine();
-			if (lineRef == null) {
-				System.err.println("Error: files not of same length.");
-				System.exit(1);
+		// Stdio: one input per line from stdin
+		if (stdio) {
+			String line;
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					System.in));
+			while ((line = in.readLine()) != null) {
+				int split = line.indexOf(" ||| ");
+				if (split == -1) {
+					System.err
+							.println("Format error, use: sentence 1 ||| sentence 2");
+					continue;
+				}
+				Alignment a = aligner.align(line.substring(0, split),
+						line.substring(split + 5));
+				System.out.println(a.toString());
 			}
-			line++;
+		} else {
+			// Open files
+			BufferedReader inTest = null;
+			BufferedReader inRef = null;
 			try {
-				// Align
-				Alignment a = aligner.align(lineTest, lineRef);
-				// Output results
-				System.out.println(a.toString("Alignment " + line));
+				inTest = new BufferedReader(new InputStreamReader(
+						new FileInputStream(test), "UTF-8"));
+				inRef = new BufferedReader(new InputStreamReader(
+						new FileInputStream(ref), "UTF-8"));
 			} catch (Exception ex) {
 				ex.printStackTrace();
+				System.exit(1);
+			}
+
+			// Read lines
+			String lineTest;
+			String lineRef;
+			int line = 0;
+			while ((lineTest = inTest.readLine()) != null) {
+				lineRef = inRef.readLine();
+				if (lineRef == null) {
+					System.err.println("Error: files not of same length.");
+					System.exit(1);
+				}
+				line++;
+				try {
+					// Align
+					Alignment a = aligner.align(lineTest, lineRef);
+					// Output results
+					System.out.println(a.toString("Alignment " + line));
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		}
 	}
